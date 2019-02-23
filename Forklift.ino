@@ -49,21 +49,21 @@ void setup() {
 
 void loop() {
 
-  analogWrite(Ain1_lift, 0);
-  analogWrite(Ain2_lift, 75);
-  delay(300);
-  analogWrite(Ain1_lift, 0);
-  analogWrite(Ain2_lift, 0);
-  delay(2000);
-  
-  analogWrite(Ain1_lift, 75);
-  analogWrite(Ain2_lift, 0);
-  delay(300);
-  analogWrite(Ain1_lift, 0);
-  analogWrite(Ain2_lift, 0);
-  delay(2000);
-
-  return;
+//  analogWrite(Ain1_lift, 0);
+//  analogWrite(Ain2_lift, 75);
+//  delay(300);
+//  analogWrite(Ain1_lift, 0);
+//  analogWrite(Ain2_lift, 0);
+//  delay(2000);
+//  
+//  analogWrite(Ain1_lift, 75);
+//  analogWrite(Ain2_lift, 0);
+//  delay(300);
+//  analogWrite(Ain1_lift, 0);
+//  analogWrite(Ain2_lift, 0);
+//  delay(2000);
+//
+//  return;
 
   if (Serial1.available())
   {
@@ -83,6 +83,7 @@ void processCommand() {
   char separator = ',';
   int percW = getValue(btBuffer, separator, 0).toInt();
   int percH = getValue(btBuffer, separator, 1).toInt();
+  int liftPos = getValue(btBuffer, separator, 2).toInt();
   int valServo = map(percW, 100, 0, servoMaxLeft, servoMaxRight);   // Switch the values 100 and 0 to reverse direction
   int spdMotor = 0;
 
@@ -92,7 +93,10 @@ void processCommand() {
   Serial.print(percH);
   Serial.print(", Servo: ");
   Serial.print(valServo);
+  Serial.print(", Lift position: ");
+  Serial.print(liftPos);  
 
+  // Forward/Backward
   if (percH < 50) {
     spdMotor = map(percH, 50, 0, 50, 255);
     Serial.print(", Motor Forward: ");
@@ -106,9 +110,26 @@ void processCommand() {
   }
   Serial.println(spdMotor);
 
-  // Commands
+  // Lift
+  switch (liftPos) {
+    case 1:
+      analogWrite(Ain1_lift, 60);
+      analogWrite(Ain2_lift, 0);
+    break;
+    case 0:
+      analogWrite(Ain1_lift, 0);
+      analogWrite(Ain2_lift, 0);
+    break;
+    case -1:
+      analogWrite(Ain1_lift, 0);
+      analogWrite(Ain2_lift, 60);
+    break;
+  }
+
+  // Steering
   myservo.write(valServo);
-  delay(60);
+
+  delay(60);  
 }
 
 // Switch the names of the functions motorBackward and motorForward to reverse direction
