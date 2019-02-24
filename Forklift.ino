@@ -113,7 +113,7 @@ void processCommand() {
   // Lift
   switch (liftPos) {
     case 1:
-      analogWrite(Ain1_lift, 60);
+      analogWrite(Ain1_lift, 120);
       analogWrite(Ain2_lift, 0);
     break;
     case 0:
