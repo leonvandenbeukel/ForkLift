@@ -7,11 +7,19 @@
 
 #include <Servo.h>
 
-Servo myservo;            
-int servoMaxLeft = 30;
-int servoMaxRight = 145;
-int servoCenter = (servoMaxRight - servoMaxLeft)/2;
+Servo servoSteering;        
+Servo servoLift;    
+
+// Warning: you need to calibrate these values with your specific servo:
+int servoMaxLeft = 30;                                // Steering value when at the lowest position
+int servoMaxRight = 145;                              // Steering value when at the highest position
+int servoCenter = (servoMaxRight - servoMaxLeft)/2;   // Steering center position
+int servoLiftCenter = 85;                             // Vertical lift center position
+int servoLiftCenterMax = 155;                         // Vertical lift maximum position forward:  85 + 70
+int servoLiftCenterMin = 35;                          // Vertical lift minimum position backward: 85 - 50
+
 #define servoPin 22          // LET: GEBRUIK VAN SERVO DISABLED PWM OP 9 en 10!
+#define servoLiftPin 24
 
 String btBuffer;
  
@@ -25,7 +33,8 @@ String btBuffer;
 #define Ain2_lift 7
 
 void setup() {
-  myservo.attach(servoPin);  // attaches the servo on pin 9 to the servo object
+  servoSteering.attach(servoPin);     
+  servoLift.attach(servoLiftPin);
 
   Serial.begin(57600);
   Serial1.begin(9600);
@@ -44,25 +53,17 @@ void setup() {
   analogWrite(Ain1_lift, 0);
   analogWrite(Ain2_lift, 0);
   
-  myservo.write(servoCenter); 
+  servoSteering.write(servoCenter); 
+  servoLift.write(servoLiftCenterMin);
 }
 
 void loop() {
-
-//  analogWrite(Ain1_lift, 0);
-//  analogWrite(Ain2_lift, 75);
-//  delay(300);
-//  analogWrite(Ain1_lift, 0);
-//  analogWrite(Ain2_lift, 0);
+//return;
+//  servoLift.write(servoLiftCenter - 50);
+//  Serial.println(servoLift.read());
 //  delay(2000);
-//  
-//  analogWrite(Ain1_lift, 75);
-//  analogWrite(Ain2_lift, 0);
-//  delay(300);
-//  analogWrite(Ain1_lift, 0);
-//  analogWrite(Ain2_lift, 0);
+//  servoLift.write(servoLiftCenter - 20);
 //  delay(2000);
-//
 //  return;
 
   if (Serial1.available())
@@ -84,7 +85,10 @@ void processCommand() {
   int percW = getValue(btBuffer, separator, 0).toInt();
   int percH = getValue(btBuffer, separator, 1).toInt();
   int liftPos = getValue(btBuffer, separator, 2).toInt();
+  int liftVerticalPos = getValue(btBuffer, separator, 3).toInt();
+
   int valServo = map(percW, 100, 0, servoMaxLeft, servoMaxRight);   // Switch the values 100 and 0 to reverse direction
+  int valLiftServo = map(liftVerticalPos, 100, 0, servoLiftCenterMin, servoLiftCenterMax); 
   int spdMotor = 0;
 
   Serial.print("W: ");
@@ -95,20 +99,25 @@ void processCommand() {
   Serial.print(valServo);
   Serial.print(", Lift position: ");
   Serial.print(liftPos);  
+  Serial.print(", Vertical raw: ");
+  Serial.print(liftVerticalPos);
+  Serial.print(", Vertical calculated: ");
+  Serial.print(valLiftServo);
 
   // Forward/Backward
   if (percH < 50) {
     spdMotor = map(percH, 50, 0, 50, 255);
     Serial.print(", Motor Forward: ");
+    Serial.print(spdMotor);
     motorForward(spdMotor);
   } else if (percH > 50) {
     spdMotor = map(percH, 50, 100, 50, 255);
     Serial.print(", Motor Backwards: ");
+    Serial.print(spdMotor);
     motorBackward(spdMotor);
   } else if (percH == 50) {
     stopMoving();
-  }
-  Serial.println(spdMotor);
+  } 
 
   // Lift
   switch (liftPos) {
@@ -126,9 +135,13 @@ void processCommand() {
     break;
   }
 
-  // Steering
-  myservo.write(valServo);
+  // Lift vertical position
+  servoLift.write(valLiftServo);
 
+  // Steering
+  servoSteering.write(valServo);
+
+  Serial.println();
   delay(60);  
 }
 
