@@ -10,7 +10,7 @@
 Servo servoSteering;        
 Servo servoLift;    
 
-// Warning: you need to calibrate these values with your specific servo:
+// Warning: you need to calibrate these values with your specific servos:
 int servoMaxLeft = 30;                                // Steering value when at the lowest position
 int servoMaxRight = 145;                              // Steering value when at the highest position
 int servoCenter = (servoMaxRight - servoMaxLeft)/2;   // Steering center position
@@ -18,7 +18,7 @@ int servoLiftCenter = 85;                             // Vertical lift center po
 int servoLiftCenterMax = 155;                         // Vertical lift maximum position forward:  85 + 70
 int servoLiftCenterMin = 35;                          // Vertical lift minimum position backward: 85 - 50
 
-#define servoPin 22          // LET: GEBRUIK VAN SERVO DISABLED PWM OP 9 en 10!
+#define servoPin 22          
 #define servoLiftPin 24
 
 String btBuffer;
@@ -39,12 +39,12 @@ void setup() {
   Serial.begin(57600);
   Serial1.begin(9600);
 
-  pinMode(Ain1, OUTPUT);  // A in1
-  pinMode(Ain2, OUTPUT);  // A in2
-  pinMode(Bin1, OUTPUT);  // B in1
-  pinMode(Bin2, OUTPUT);  // B in2
-  pinMode(Ain1_lift, OUTPUT);  // Lift motor
-  pinMode(Ain2_lift, OUTPUT);  // Lift motor
+  pinMode(Ain1, OUTPUT);        // A in1
+  pinMode(Ain2, OUTPUT);        // A in2
+  pinMode(Bin1, OUTPUT);        // B in1
+  pinMode(Bin2, OUTPUT);        // B in2
+  pinMode(Ain1_lift, OUTPUT);   // Lift motor
+  pinMode(Ain2_lift, OUTPUT);   // Lift motor
 
   analogWrite(Ain1,0);
   analogWrite(Ain2,0);
@@ -58,17 +58,9 @@ void setup() {
 }
 
 void loop() {
-//return;
-//  servoLift.write(servoLiftCenter - 50);
-//  Serial.println(servoLift.read());
-//  delay(2000);
-//  servoLift.write(servoLiftCenter - 20);
-//  delay(2000);
-//  return;
 
   if (Serial1.available())
   {
-    //char received = BTSerial.read();
     char received = Serial1.read();
     btBuffer += received; 
     if (received == '|')
@@ -119,26 +111,24 @@ void processCommand() {
     stopMoving();
   } 
 
-  // Lift
-  switch (liftPos) {
-    case 1:
-      analogWrite(Ain1_lift, 120);
-      analogWrite(Ain2_lift, 0);
-    break;
-    case 0:
-      analogWrite(Ain1_lift, 0);
-      analogWrite(Ain2_lift, 0);
-    break;
-    case -1:
-      analogWrite(Ain1_lift, 0);
-      analogWrite(Ain2_lift, 60);
-    break;
+  // Lift Up/Down
+  if (liftPos == 0) {
+    analogWrite(Ain1_lift, 0);
+    analogWrite(Ain2_lift, 0);    
+  } else if (liftPos > 0) {
+    int perc2val = map(liftPos, 0, 100, 0, 255);
+    analogWrite(Ain1_lift, perc2val);
+    analogWrite(Ain2_lift, 0);    
+  } else if (liftPos < 0) {
+    int perc2val = map(liftPos, 0, -100, 0, 255);
+    analogWrite(Ain1_lift, 0);
+    analogWrite(Ain2_lift, perc2val);    
   }
 
-  // Lift vertical position
+  // Lift vertical position Forward/Backward
   servoLift.write(valLiftServo);
 
-  // Steering
+  // Steering Left/Right
   servoSteering.write(valServo);
 
   Serial.println();
