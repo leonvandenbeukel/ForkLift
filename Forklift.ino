@@ -6,11 +6,12 @@
  */
 
 #include <Servo.h>
+#include <FastLED.h>
 
 Servo servoSteering;        
 Servo servoLift;    
 
-// Warning: you need to calibrate these values with your specific servos:
+// Calibrate these servos values
 int servoMaxLeft = 30;                                // Steering value when at the lowest position
 int servoMaxRight = 145;                              // Steering value when at the highest position
 int servoCenter = (servoMaxRight - servoMaxLeft)/2;   // Steering center position
@@ -20,6 +21,10 @@ int servoLiftCenterMin = 35;                          // Vertical lift minimum p
 
 #define servoPin 22          
 #define servoLiftPin 24
+
+#define NUM_LEDS 8     
+#define DATA_PIN 26
+CRGB LEDs[NUM_LEDS];
 
 String btBuffer;
  
@@ -33,11 +38,15 @@ String btBuffer;
 #define Ain2_lift 7
 
 void setup() {
+
+  FastLED.delay(3000);
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(LEDs, NUM_LEDS);
+  
   servoSteering.attach(servoPin);     
   servoLift.attach(servoLiftPin);
 
-  Serial.begin(57600);
-  Serial1.begin(9600);
+  Serial.begin(57600);          // Debug
+  Serial1.begin(9600);          // Bluetooth
 
   pinMode(Ain1, OUTPUT);        // A in1
   pinMode(Ain2, OUTPUT);        // A in2
@@ -45,6 +54,8 @@ void setup() {
   pinMode(Bin2, OUTPUT);        // B in2
   pinMode(Ain1_lift, OUTPUT);   // Lift motor
   pinMode(Ain2_lift, OUTPUT);   // Lift motor
+
+  ledStartup();  
 
   analogWrite(Ain1,0);
   analogWrite(Ain2,0);
@@ -54,7 +65,7 @@ void setup() {
   analogWrite(Ain2_lift, 0);
   
   servoSteering.write(servoCenter); 
-  servoLift.write(servoLiftCenterMin);
+  servoLift.write(servoLiftCenterMin);  
 }
 
 void loop() {
@@ -78,6 +89,7 @@ void processCommand() {
   int percH = getValue(btBuffer, separator, 1).toInt();
   int liftPos = getValue(btBuffer, separator, 2).toInt();
   int liftVerticalPos = getValue(btBuffer, separator, 3).toInt();
+  int lightOn = getValue(btBuffer, separator, 4).toInt();
 
   int valServo = map(percW, 100, 0, servoMaxLeft, servoMaxRight);   // Switch the values 100 and 0 to reverse direction
   int valLiftServo = map(liftVerticalPos, 100, 0, servoLiftCenterMin, servoLiftCenterMax); 
@@ -131,6 +143,12 @@ void processCommand() {
   // Steering Left/Right
   servoSteering.write(valServo);
 
+  if (lightOn == 1) {
+    ledToggle(CRGB::White);
+  } else {
+    ledToggle(CRGB::Black);
+  }
+
   Serial.println();
   delay(60);  
 }
@@ -156,6 +174,39 @@ void stopMoving() {
   analogWrite(Ain2,0);
   analogWrite(Bin2,0);
   analogWrite(Bin1,0);
+}
+
+void ledStartup() {
+
+  int dly = 700;
+  LEDs[0] = CRGB::Red;
+  LEDs[7] = CRGB::Red;
+  FastLED.show();  
+  delay(dly);
+  ledToggle(CRGB::Black);
+  LEDs[1] = CRGB::Red;
+  LEDs[6] = CRGB::Red;
+  FastLED.show();  
+  delay(dly);
+  ledToggle(CRGB::Black);
+  LEDs[2] = CRGB::Red;
+  LEDs[5] = CRGB::Red;
+  FastLED.show();  
+  delay(dly);
+  ledToggle(CRGB::Black);
+  LEDs[3] = CRGB::Red;
+  LEDs[4] = CRGB::Red;
+  FastLED.show();  
+  delay(dly);
+
+  ledToggle(CRGB::Black);
+}
+
+void ledToggle(CRGB color) {
+   for (int i=0; i<NUM_LEDS; i++){
+    LEDs[i] = color;
+  }
+  FastLED.show();  
 }
 
 String getValue(String data, char separator, int index) {
