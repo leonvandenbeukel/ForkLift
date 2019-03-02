@@ -1,4 +1,29 @@
 /*
+ * MIT License
+ * 
+ * Copyright (c) 2019 Leon van den Beukel
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * Source: 
+ * https://github.com/leonvandenbeukel/ForkLift * 
+ * 
  * Use an Arduino Mega 2560 because: 
  *  - Cannot use SoftwareSerial for the Bluetooth module because this will mess up the internal timers when using the Servo lib and causing servo jitter
  *  - At least 6 PWM pins are needed for the motors, the Servo lib disables PWM on pins 9 & 10  
@@ -90,7 +115,6 @@ void processCommand() {
   int liftPos = getValue(btBuffer, separator, 2).toInt();
   int liftVerticalPos = getValue(btBuffer, separator, 3).toInt();
   int lightOn = getValue(btBuffer, separator, 4).toInt();
-
   int valServo = map(percW, 100, 0, servoMaxLeft, servoMaxRight);   // Switch the values 100 and 0 to reverse direction
   int valLiftServo = map(liftVerticalPos, 100, 0, servoLiftCenterMin, servoLiftCenterMax); 
   int spdMotor = 0;
