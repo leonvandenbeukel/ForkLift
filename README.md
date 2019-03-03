@@ -24,6 +24,11 @@
 | M3 screws and nuts                                |
 | Small amount of several other nuts and bolts      |
 
+### YouTube video
+
+<a href="https://youtu.be/_YNgo8A7p8A" target="_blank"><img src="https://img.youtube.com/vi/_YNgo8A7p8A/0.jpg" 
+alt="Click to view: Homemade CNC with 3D printed parts V2" width="500" border="1" /></a>
+
 ### Android App
 
 The Xamarin Android App can be found on:
