@@ -4,7 +4,7 @@
 
 ![alt text](https://github.com/leonvandenbeukel/ForkLift/blob/master/Drawing/Schema.png)
 
-### Parts list
+### Parts list (just Google on the name to find a link where to buy)
 
 | Components                              			    |
 | -------------                          			      |
