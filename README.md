@@ -27,7 +27,7 @@
 ### YouTube video
 
 <a href="https://youtu.be/_YNgo8A7p8A" target="_blank"><img src="https://img.youtube.com/vi/_YNgo8A7p8A/0.jpg" 
-alt="Click to view: Homemade CNC with 3D printed parts V2" width="500" border="1" /></a>
+alt="Click to view: Arduino Forklift" width="500" border="1" /></a>
 
 ### Android App
 
